@@ -1,0 +1,129 @@
+.headers on
+
+-- Name: William Chan
+-- File: quiz03-William.sql
+-- Date: July 16, 2020
+
+--1. Using SQLite and the Northwind database, create a line item report that contains a line for each
+--product in the order with the following columns: the order id, the product id, the unit price, the
+--quantity sold, the line item price, and the percent of that line item constitutes of the total amount of
+--the order.
+select orderid, productid, unitprice, (unitprice * quantity) as line_total, ((unitprice*quantity)/(sum(unitprice*quantity)))*100 as PctOfTotalOrder from order_details group by productid order by orderid limit 25;
+OrderID|ProductID|UnitPrice|line_total|PctOfTotalOrder
+10248|11|14.0|168.0|1.20845921450151
+10248|42|9.8|98.0|1.05010501050105
+10248|72|34.8|174.0|0.676022192176791
+10249|14|18.6|167.4|1.93965517241379
+10249|51|42.4|1696.0|3.79057095475006
+10250|41|7.7|77.0|0.846330552532946
+10250|65|16.8|252.0|1.72520024645718
+10251|22|16.8|100.8|1.39372822299652
+10251|57|15.6|234.0|2.997002997003
+10252|20|64.8|2592.0|10.9664153529815
+10252|33|2.0|50.0|2.91800408520572
+10252|60|27.2|1088.0|2.16362407031778
+10253|31|10.0|200.0|1.23666718194466
+10253|39|14.4|604.8|4.59895975910211
+10253|49|16.0|640.0|6.73684210526316
+10254|24|3.6|54.0|1.1290929619872
+10254|55|19.2|403.2|2.06642066420664
+10254|74|8.0|168.0|6.54715510522214
+10255|2|15.2|304.0|1.63800163800164
+10255|16|13.9|486.5|2.59493654006683
+10255|36|15.2|380.0|2.61301280376274
+10255|59|44.0|1320.0|1.73010380622837
+10256|53|26.2|393.0|1.82704019488429
+10256|77|10.4|124.8|1.28859060402685
+10257|27|35.1|877.5|5.76108722056265
+--2. I want to know the unique (distinct) cities, regions, and postal codes: (a) where we have both customers
+--and employees, (b) where we have customers but no employees AND both customers ad employees,
+--and (c) where we have employees but no customers AND both customers and employees. Write three
+--queries, using inner and outer joins. Report the results of the queries. There is no need for any further
+--reporting.
+--a.
+select c.city, c.region, e.region, c.postalcode, e.postalcode from customers c join employees e on c.city like e.city group by c.city order by e.city;
+City|Region|Region|PostalCode|PostalCode
+Kirkland|WA|WA|98034|98033
+London||NULL|WA1 1DP|SW1 8JR
+Seattle|WA|WA|98128|98122
+--b.
+select c.city, c.region, e.region, c.postalcode, e.postalcode from customers c left join employees e on c.city like e.city group by c.city order by e.city;
+City|Region|Region|PostalCode|PostalCode
+Aachen|||52066|
+Albuquerque|NM||87110|
+Anchorage|AK||99508|
+Barcelona|||08022|
+Barquisimeto|Lara||3508|
+Bergamo|||24100|
+Berlin|||12209|
+Bern|||3012|
+Boise|ID||83720|
+Brandenburg|||14776|
+Bruxelles|||B-1180|
+Bräcke|||S-844 67|
+Buenos Aires|||1010|
+Butte|MT||59801|
+Campinas|SP||04876-786|
+Caracas|DF||1081|
+Charleroi|||B-6000|
+City|Region||PostalCode|
+Cork|Co. Cork|||
+Cowes|Isle of Wight||PO31 7PJ|
+Cunewalde|||01307|
+Elgin|OR||97827|
+Eugene|OR||97403|
+Frankfurt a.M.|||60528|
+Genève|||1203|
+Graz|||8010|
+Helsinki|||21240|
+I. de Margarita|Nueva Esparta||4980|
+Kobenhavn|||1734|
+Köln|||50739|
+Lander|WY||82520|
+Leipzig|||04179|
+Lille|||59000|
+Lisboa|||1675|
+Luleå|||S-958 22|
+Lyon|||69004|
+Madrid|||28023|
+Mannheim|||68306|
+Marseille|||13008|
+Montréal|Québec||H1J 1C3|
+México D.F.|||05021|
+München|||80805|
+Münster|||44087|
+Nantes|||44000|
+Oulu|||90110|
+Paris|||75012|
+Portland|OR||97219|
+Reggio Emilia|||42100|
+Reims|||51100|
+Resende|SP||08737-363|
+Rio de Janeiro|RJ||05454-876|
+Salzburg|||5020|
+San Cristóbal|Táchira||5022|
+San Francisco|CA||94117|
+Sao Paulo|SP||05432-043|
+Sevilla|||41101|
+Stavern|||4110|
+Strasbourg|||67000|
+Stuttgart|||70563|
+Torino|||10100|
+Toulouse|||31000|
+Tsawassen|BC||T2F 8M4|
+Vancouver|BC||V3F 2K1|
+Versailles|||78000|
+Walla Walla|WA||99362|
+Warszawa|||01-012|
+Århus|||8200|
+Kirkland|WA|WA|98034|98033
+London||NULL|WA1 1DP|SW1 8JR
+Seattle|WA|WA|98128|98122
+--c.
+select e.city, c.city, e.region, c.region, e.postalcode, c.postalcode from employees e left join customers c on e.city like c.city group by e.city order by c.city;
+City|City|Region|Region|PostalCode|PostalCode
+Redmond||WA||98052|
+Tacoma||WA||98401|
+Kirkland|Kirkland|WA|WA|98033|98034
+London|London|NULL||SW1 8JR|WA1 1DP
+Seattle|Seattle|WA|WA|98122|98128
