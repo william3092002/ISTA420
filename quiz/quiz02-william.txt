@@ -1,0 +1,78 @@
+.headers on
+
+-- Name: William Chan
+-- File: quiz02-william.sql
+-- Date: July 9, 2020
+
+--1. How many seafood products do we have?
+select count(productname) as number_of_seafood_p from products where categoryid = 8;
+number_of_seafood_p
+12
+
+--2. What are the names and IDs of our seafood products?
+select productname, productid from products where categoryid = 8;
+ProductName|ProductID
+Ikura|10
+Konbu|13
+Carnarvon Tigers|18
+Nord-Ost Matjeshering|30
+Inlagd Sill|36
+Gravad lax|37
+Boston Crab Meat|40
+Jack's New England Clam Chowder|41
+Rogede sild|45
+Spegesild|46
+Escargots de Bourgogne|58
+Röd Kaviar|73
+
+--3. What is the average price of our seafood products?
+select (sum(unitsinstock * unitprice)/sum(unitsinstock)) as average_price_of_s from products where categoryid = 8;
+average_price_of_s
+18.5597004279601
+
+--4. What is our highest priced seafood product, and how much does it cost?
+select productname, max(unitprice) from products where categoryid = 8;
+ProductName|max(unitprice)
+Carnarvon Tigers|62.5
+
+--5. What is our lowest priced seafood product, and how much does it cost?
+select productname, min(unitprice) from products where categoryid = 8;
+ProductName|min(unitprice)
+Konbu|6.0
+
+--6. How many customers do we have in Denmark?
+select count(customerid) from customers where country = "Denmark";
+count(customerid)
+2
+
+--7. What are the customer names and IDs of our Danish customers?
+select contactname, customerid from customers where country = "Denmark";
+ContactName|CustomerID
+Jytte Petersen|SIMOB
+Palle Ibsen|VAFFE
+
+--8. Which customers do NOT have a fax number?
+select customerid, fax from customers where fax not like ('_%');
+CustomerID|Fax
+ANTON|
+BSBEV|
+CHOPS|
+COMMI|
+FAMIA|
+FOLKO|
+GODOS|
+GOURL|
+GREAL|
+ISLAT|
+KOENE|
+LETSS|
+MORGK|
+PRINI|
+QUEEN|
+QUICK|
+RICAR|
+RICSU|
+SAVEA|
+THEBI|
+TORTU|
+WELLI|
