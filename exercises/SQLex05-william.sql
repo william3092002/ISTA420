@@ -56,19 +56,35 @@ constraint pk_presidents primary key;
  output inserted.dateLeftOffice,
  inserted.assassinationAttempt,
  inserted.assassinated
- where id = '44'
+ where id = '44';
 
 --6. Bring the data up to date by adding a new row. Use the output clause.
  insert into dbo.presidents(id, lastName, firstName, middleName, orderOfPresidency, 
  dateOfBirth, dateOfDeath, townOrCountryOfBirth, stateOfBirth, homeState, partyAffiliation,
  dateTookOffice, dateLeftOffice, assassinationAttempt, assassinated, relgiousAffliation)
+ output inserted.id, inserted.lastName, inserted.firstName, inserted.middleName, inserted.orderOfPresidency,
+ inserted.dateOfBirth, inserted.dateOfDeath, inserted.townOrCountryOfBirth, inserted.stateOfBirth,
+ inserted.homeState, inserted.partyAffiliation, inserted.dateTookOffice, inserted.dateLeftOffice, 
+ inserted.assassinationAttempt, inserted.assassinated, inserted.relgiousAffliation
  values ('45', 'Trump', 'Donald', 'J', '45', '6/14/1946', 'NULL' , 'New York', 'New York',
  'Florida', 'Republican', '1/20/2017', 'NULL', 'false', 'false', 'Presbyterian') 
 
- --7. How many presidents from each state belonged to the various political parties? Aggregate by party
---and state. Note that this will in eect be a pivot table.
+--7. How many presidents from each state belonged to the various political parties? Aggregate by party
+--and state. Note that this will in fact be a pivot table.
+
+with A as(
 select  homestate, partyAffiliation, count(id) as numPresidents
-from dbo.presidents group by partyAffiliation, homeState; 
+from dbo.presidents group by partyAffiliation, homeState 
+)
+SELECT A.homeState,
+  SUM(CASE WHEN partyAffiliation = 'Republican' THEN numPresidents END) AS Republican,
+  SUM(CASE WHEN partyAffiliation = 'Democratic' THEN numPresidents END) AS Democratic,
+  SUM(CASE WHEN partyAffiliation = 'Republican/National Union' THEN numPresidents END) AS republicanNationalUnion,
+  SUM(CASE WHEN partyAffiliation = 'Democratic-Republican/National Republican' THEN numPresidents END) AS nationalRepublican,
+  SUM(CASE WHEN partyAffiliation = 'Federalist' THEN numPresidents END) AS Federalist,
+  SUM(CASE WHEN partyAffiliation = 'Whig' THEN numPresidents END) AS Whig,
+  SUM(CASE WHEN partyAffiliation = 'Independent' THEN numPresidents END) AS Independent
+FROM A group by A.homeState;
 
 --8. Create a report showing the number of days each president was in office.
 UPDATE dbo.presidents
@@ -92,10 +108,45 @@ from dbo.presidents;
 --10. See if there is any correlation between a president's party and reported religion, or lack of reported
 --religion.
 
+--pivot and group by relgiousAffliation
+with A as(
 select partyAffiliation, relgiousAffliation, count(partyAffiliation) as numPresidents,
 convert(decimal(10,2),(100.0 * count(id) / 45)) as pctReligion
 from dbo.presidents
-group by partyAffiliation, relgiousAffliation
+group by partyAffiliation, relgiousAffliation)
+select a.relgiousAffliation, 
+  SUM(CASE WHEN partyAffiliation = 'Republican' THEN numPresidents END) AS Republican,
+  SUM(CASE WHEN partyAffiliation = 'Democratic' THEN numPresidents END) AS Democratic,
+  SUM(CASE WHEN partyAffiliation = 'Republican/National Union' THEN numPresidents END) AS republicanNationalUnion,
+  SUM(CASE WHEN partyAffiliation = 'Democratic/National Union' THEN numPresidents END) AS democraticNationalUnion,
+  SUM(CASE WHEN partyAffiliation = 'Democratic-Republican/National Republican' THEN numPresidents END) AS nationalRepublican,
+  SUM(CASE WHEN partyAffiliation = 'Democratic-Republican' THEN numPresidents END) AS democraticRepublican,
+  SUM(CASE WHEN partyAffiliation = 'Federalist' THEN numPresidents END) AS Federalist,
+  SUM(CASE WHEN partyAffiliation = 'Whig' THEN numPresidents END) AS Whig,
+  SUM(CASE WHEN partyAffiliation = 'Independent' THEN numPresidents END) AS Independent
+from A group by a.relgiousAffliation;
+
+--pivot and group by partyAffiliation
+with A as(
+select partyAffiliation, relgiousAffliation, count(partyAffiliation) as numPresidents,
+convert(decimal(10,2),(100.0 * count(id) / 45)) as pctReligion
+from dbo.presidents
+group by partyAffiliation, relgiousAffliation)
+select a.partyAffiliation, 
+SUM(CASE WHEN relgiousAffliation = 'NULL' THEN numPresidents END) AS nonReligious,
+SUM(CASE WHEN relgiousAffliation = 'Baptist' THEN numPresidents END) AS Bapist,
+SUM(CASE WHEN relgiousAffliation = 'Congregationalist' THEN numPresidents END) AS Congregationalist,
+  SUM(CASE WHEN relgiousAffliation = 'Deist/Episcopalian' THEN numPresidents END) AS Deist,
+  SUM(CASE WHEN relgiousAffliation = 'Dutch Reformed' THEN numPresidents END) AS dutchReformed,
+SUM(CASE WHEN relgiousAffliation = 'Episcopalian' THEN numPresidents END) AS Episcopalian,
+  SUM(CASE WHEN relgiousAffliation = 'Methodist' THEN numPresidents END) AS Methodist,
+  SUM(CASE WHEN relgiousAffliation = 'Presbyterian' THEN numPresidents END) AS Presbyterian,
+  SUM(CASE WHEN relgiousAffliation = 'Presbyterian/Methodist' THEN numPresidents END) AS presbyterianMethodist,
+  SUM(CASE WHEN relgiousAffliation = 'Quaker' THEN numPresidents END) AS Quaker,
+  SUM(CASE WHEN relgiousAffliation = 'Roman Catholic' THEN numPresidents END) AS romanCatholic,
+  SUM(CASE WHEN relgiousAffliation = 'Unaffiliated Christian' THEN numPresidents END) AS unaffiliatedChristian,
+  SUM(CASE WHEN relgiousAffliation = 'Unitarian' THEN numPresidents END) AS Unitarian
+  from A group by a.partyAffiliation;
 
 
 
