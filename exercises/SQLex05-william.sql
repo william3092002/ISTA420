@@ -43,13 +43,17 @@ go
 
 ALTER TABLE dbo.presidents DROP COLUMN imagePath;
 
---4. Delete the rst record from your table using the output clause. This is the header.DELETE FROM dbo.presidents WHERE id = 'id';--You may combine the following two steps--Alter the presidents table by adding an integer column, beginning at 1 and ending at 44, that is NOT NULL and UNIQUE.
+--4. Delete the rst record from your table using the output clause. This is the header.
+DELETE FROM dbo.presidents WHERE id = 'id';
+--You may combine the following two steps
+--Alter the presidents table by adding an integer column, beginning at 1 and ending at 44, that is NOT NULL and UNIQUE.
 --Alter the presidents table by adding the column you created as a primary key column with a new constraint.
 ALTER TABLE dbo.presidents ADD pk int not null identity (1, 1)
 constraint pk_presidents primary key;
 
 
---5. Bring the data up to date by updating the last row. Use the output clause.UPDATE dbo.presidents
+--5. Bring the data up to date by updating the last row. Use the output clause.
+UPDATE dbo.presidents
  SET dateLeftOffice = '1/20/2017',
  assassinationAttempt = 'false',
  assassinated = 'false'
@@ -58,7 +62,8 @@ constraint pk_presidents primary key;
  inserted.assassinated
  where id = '44';
 
---6. Bring the data up to date by adding a new row. Use the output clause.
+--6. Bring the data up to date by adding a new row. Use the output clause.
+
  insert into dbo.presidents(id, lastName, firstName, middleName, orderOfPresidency, 
  dateOfBirth, dateOfDeath, townOrCountryOfBirth, stateOfBirth, homeState, partyAffiliation,
  dateTookOffice, dateLeftOffice, assassinationAttempt, assassinated, relgiousAffliation)
@@ -148,6 +153,7 @@ SUM(CASE WHEN relgiousAffliation = 'Episcopalian' THEN numPresidents END) AS Epi
   SUM(CASE WHEN relgiousAffliation = 'Unitarian' THEN numPresidents END) AS Unitarian
   from A group by a.partyAffiliation;
 
+  select * from dbo.presidents where assassinationAttempt = 'true';
 
 
 
